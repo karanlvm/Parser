@@ -11,7 +11,7 @@ namespace simpleparser {
 
     using namespace std;
 
-    enum TokenType{
+    enum TokenType {
         WHITESPACE,  // No token ever has this type
         IDENTIFIER,
         INTEGER_LITERAL,
@@ -20,22 +20,37 @@ namespace simpleparser {
         OPERATOR,
         STRING_ESCAPE_SEQUENCE,
         POTENTIAL_DOUBLE,
+        POTENTIAL_COMMENT,
+        COMMENT,
     };
 
-    class Token{
+    static const char *sTokenTypeStrings[] = {
+            "WHITESPACE",
+            "IDENTIFIER",
+            "INTEGER_LITERAL",
+            "DOUBLE_LITERAL",
+            "STRING_LITERAL",
+            "OPERATOR",
+            "STRING_ESCAPE_SEQUENCE",
+            "POTENTIAL_DOUBLE",
+            "POTENTIAL_COMMENT",
+            "COMMENT",
+    };
+
+    class Token {
     public:
         enum TokenType mType{WHITESPACE};
         string mText;
-        size_t mStartOffset{0};
-        size_t mEndOffset{0};
         size_t mLineNumber{0};
+
+        void debugPrint() const;
     };
 
-    class Tokenizer{
+    class Tokenizer {
     public:
         vector<Token> parse(const string &inProgram);
 
     private:
-        void endToken(Token &token, vector<Token> &tokens );
+        void endToken(Token &token, vector<Token> &tokens);
     };
 }

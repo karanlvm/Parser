@@ -4,19 +4,19 @@
 
 #include "Tokenizer.hpp"
 #include <stdexcept>
+#include <iostream>
 
 namespace simpleparser {
 
     using namespace std;
 
-    vector<Token> simpleparser::Tokenizer::parse(const string &inProgram) {
+    vector<Token> Tokenizer::parse(const std::string &inProgram) {
         vector<Token> tokens;
         Token currentToken;
 
         currentToken.mLineNumber = 1;
 
-
-        for (char currCh: inProgram) {
+        for (char currCh : inProgram) {
             if (currentToken.mType == STRING_ESCAPE_SEQUENCE) {
                 switch (currCh) {
                     case 'n':
@@ -32,10 +32,16 @@ namespace simpleparser {
                         currentToken.mText.append(1, '\\');
                         break;
                     default:
-                        throw runtime_error(string("Unknown escape sequence: \\") + string(1, currCh) + " on Line" +
-                                            to_string(currentToken.mLineNumber) + ".");
+                        throw runtime_error(string("unknown escape sequence: \\") + string(1, currCh) +
+                                            " in string on line " + to_string(currentToken.mLineNumber) + ".");
                         break;
                 }
+                currentToken.mType = STRING_LITERAL;
+                continue;
+            } else if (currentToken.mType == POTENTIAL_COMMENT && currCh != '/') {
+                currentToken.mType = OPERATOR;
+                endToken(currentToken, tokens);
+                continue;
             }
 
             switch (currCh) {
@@ -52,6 +58,9 @@ namespace simpleparser {
                     if (currentToken.mType == WHITESPACE) {
                         currentToken.mType = INTEGER_LITERAL;
                         currentToken.mText.append(1, currCh);
+                    } else if (currentToken.mType == POTENTIAL_DOUBLE) {
+                        currentToken.mType = DOUBLE_LITERAL;
+                        currentToken.mText.append(1, currCh);
                     } else {
                         currentToken.mText.append(1, currCh);
                     }
@@ -61,15 +70,12 @@ namespace simpleparser {
                     if (currentToken.mType == WHITESPACE) {
                         currentToken.mType = POTENTIAL_DOUBLE;
                         currentToken.mText.append(1, currCh);
-                    } else if(currentToken.mType == INTEGER_LITERAL){
+                    } else if (currentToken.mType == INTEGER_LITERAL) {
                         currentToken.mType = DOUBLE_LITERAL;
                         currentToken.mText.append(1, currCh);
-                    }
-                    else if(currentToken.mType == STRING_LITERAL){
-                        currentToken.mType = DOUBLE_LITERAL;
+                    } else if (currentToken.mType == STRING_LITERAL) {
                         currentToken.mText.append(1, currCh);
-                    }
-                    else{
+                    } else {
                         endToken(currentToken, tokens);
                         currentToken.mType = OPERATOR;
                         currentToken.mText.append(1, currCh);
@@ -77,16 +83,18 @@ namespace simpleparser {
                     }
                     break;
 
-
                 case '{':
                 case '}':
                 case '(':
                 case ')':
                 case '=':
+                case '+':
                 case '-':
+                case '*':
+                case '<':
                 case ';':
                 case ',':
-                    if (currentToken.mType == STRING_LITERAL) {
+                    if (currentToken.mType != STRING_LITERAL) {
                         endToken(currentToken, tokens);
                         currentToken.mType = OPERATOR;
                         currentToken.mText.append(1, currCh);
@@ -98,9 +106,13 @@ namespace simpleparser {
 
                 case ' ':
                 case '\t':
-                    endToken(currentToken, tokens);
+                    if (currentToken.mType == STRING_LITERAL || currentToken.mType == COMMENT) {
+                        currentToken.mText.append(1, currCh);
+                    } else {
+                        endToken(currentToken, tokens);
+                    }
                     break;
-                    // r is for unix and combination of both is used for windows native files
+
                 case '\r':
                 case '\n':
                     endToken(currentToken, tokens);
@@ -111,7 +123,6 @@ namespace simpleparser {
                     if (currentToken.mType != STRING_LITERAL) {
                         endToken(currentToken, tokens);
                         currentToken.mType = STRING_LITERAL;
-                        currentToken.mText.append(1, currCh);
                     } else if (currentToken.mType == STRING_LITERAL) {
                         endToken(currentToken, tokens);
                     }
@@ -126,25 +137,58 @@ namespace simpleparser {
                         currentToken.mText.append(1, currCh);
                         endToken(currentToken, tokens);
                     }
+                    break;
 
+                case '/':
+                    if (currentToken.mType == STRING_LITERAL) {
+                        currentToken.mText.append(1, currCh);
+                    } else if (currentToken.mType == POTENTIAL_COMMENT) {
+                        currentToken.mType = COMMENT;
+                        currentToken.mText.erase();
+                    } else {
+                        endToken(currentToken, tokens);
+                        currentToken.mType = POTENTIAL_COMMENT;
+                        currentToken.mText.append(1, currCh);
+                    }
                     break;
 
                 default:
+                    if (currentToken.mType == WHITESPACE || currentToken.mType == INTEGER_LITERAL
+                        || currentToken.mType == DOUBLE_LITERAL) {
+                        endToken(currentToken, tokens);
+                        currentToken.mType = IDENTIFIER;
+                        currentToken.mText.append(1, currCh);
+                    } else {
+                        currentToken.mText.append(1, currCh);
+                    }
                     break;
             }
         }
 
+        endToken(currentToken, tokens);
 
         return tokens;
     }
 
 
     void Tokenizer::endToken(Token &token, vector<Token> &tokens) {
-        if (token.mType != WHITESPACE) {
+        if (token.mType == COMMENT) {
+            cout << "Ignoring comment " << token.mText << endl;
+        } else if (token.mType != WHITESPACE) {
             tokens.push_back(token);
         }
-        // Push to token list and clear the string, so we can move to the next
+        if (token.mType == POTENTIAL_DOUBLE) {
+            if (token.mText.compare(".") == 0) {
+                token.mType = OPERATOR;
+            } else {
+                token.mType = DOUBLE_LITERAL;
+            }
+        }
         token.mType = WHITESPACE;
         token.mText.erase();
+    }
+
+    void Token::debugPrint() const {
+        cout << "Token(" << sTokenTypeStrings[mType] << ", \"" << mText << "\", " << mLineNumber << ")" << endl;
     }
 }
