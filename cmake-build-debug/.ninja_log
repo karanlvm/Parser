@@ -1,11 +1,4 @@
 # ninja log v5
-0	783	6773212279739418	CMakeFiles/Parser.dir/main.cpp.obj	2c025984e214237b
-786	1179	6773212283683010	Parser.exe	f6fc05bbb984a707
-3	614	6773648421827186	CMakeFiles/Parser.dir/main.cpp.obj	2c025984e214237b
-32	633	6773648422007348	CMakeFiles/Parser.dir/Tokenizer.cpp.obj	4f715ca9a1e09d0f
-634	978	6773648425430462	Parser.exe	2eff45dd6e7813e7
 3	394	6773651213208313	CMakeFiles/Parser.dir/main.cpp.obj	2c025984e214237b
-13	495	6773651214269277	CMakeFiles/Parser.dir/Tokenizer.cpp.obj	4f715ca9a1e09d0f
-495	675	6773651216040889	Parser.exe	2eff45dd6e7813e7
-3	379	6773652083836907	CMakeFiles/Parser.dir/Tokenizer.cpp.obj	4f715ca9a1e09d0f
 384	497	6773652084997964	Parser.exe	2eff45dd6e7813e7
+3	379	6773652083836907	CMakeFiles/Parser.dir/Tokenizer.cpp.obj	4f715ca9a1e09d0f

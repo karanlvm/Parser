@@ -61,6 +61,12 @@ build CMakeFiles/Parser.dir/Tokenizer.cpp.obj: CXX_COMPILER__Parser_Debug C$:/Us
   OBJECT_DIR = CMakeFiles\Parser.dir
   OBJECT_FILE_DIR = CMakeFiles\Parser.dir
 
+build CMakeFiles/Parser.dir/Parser.cpp.obj: CXX_COMPILER__Parser_Debug C$:/Users/karan/Documents/GitHub/Parser/Parser.cpp || cmake_object_order_depends_target_Parser
+  DEP_FILE = CMakeFiles\Parser.dir\Parser.cpp.obj.d
+  FLAGS = -g -std=gnu++14
+  OBJECT_DIR = CMakeFiles\Parser.dir
+  OBJECT_FILE_DIR = CMakeFiles\Parser.dir
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target Parser
@@ -69,7 +75,7 @@ build CMakeFiles/Parser.dir/Tokenizer.cpp.obj: CXX_COMPILER__Parser_Debug C$:/Us
 #############################################
 # Link the executable Parser.exe
 
-build Parser.exe: CXX_EXECUTABLE_LINKER__Parser_Debug CMakeFiles/Parser.dir/main.cpp.obj CMakeFiles/Parser.dir/Tokenizer.cpp.obj
+build Parser.exe: CXX_EXECUTABLE_LINKER__Parser_Debug CMakeFiles/Parser.dir/main.cpp.obj CMakeFiles/Parser.dir/Tokenizer.cpp.obj CMakeFiles/Parser.dir/Parser.cpp.obj
   FLAGS = -g
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\Parser.dir
